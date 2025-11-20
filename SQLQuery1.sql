@@ -1,25 +1,24 @@
-USE GameDb
+CREATE DATABASE GameDb  --- GameDb adinda yeni bir database olusturuyoruz
 
-CREATE TABLE Accounts(
-	ID INT IDENTITY(1,1),
-	USERID VARCHAR(50) NOT NULL ,
-	REGISTERTIME DATE DEFAULT GETDATE(),
-	CONSTRAINT PK_ID PRIMARY KEY (ID),
-    CONSTRAINT UQ_USERID UNIQUE (USERID)
+CREATE TABLE Accounts(    --- Account Tablosunun olusturulmasi
+	ID INT IDENTITY(1,1) NOT NULL, --- ID sutunu oluÅŸturuyoruz IDENTITY olarak tanimlansin 1den baslasin otomatik 1er 1er artarak deÄŸer alsin
+	USERID VARCHAR(50) NOT NULL , --- UserID adinda bir sutun olusturuyoruz VARCHAR (50) veri tipinde ve bos gecilemez! 
+	REGISTERTIME DATE DEFAULT GETDATE(), --- RegisterTime sutunu date veri tipinde ve default olarak kaydÅŸn olusturuldugu tarihi alsin
+	CONSTRAINT PK_ID PRIMARY KEY (ID), --- ID sutunu PRIMARY KEY olsun ve bu constraint PK_ID adini alsin
+    CONSTRAINT UQ_USERID UNIQUE (USERID) --- USERID UNIQUE olsun (icerisindeki bÃ¼tÃ¼n degerler birbirinden farkli olma zorunlulugu)
 );
 
 
-CREATE TABLE Players(
-	PLAYERID INT IDENTITY(1,1) NOT NULL,
-	ID INT NOT NULL,
-	JOB VARCHAR(50) NOT NULL,
-	LVL INT DEFAULT 1 CHECK (LVL>0 AND LVL <=99),
-	CREATETIME DATE DEFAULT GETDATE(),
-	CONSTRAINT PK_PLAYERID PRIMARY KEY (PLAYERID),
-	CONSTRAINT FK_ID FOREIGN KEY (ID) REFERENCES Accounts(ID)
+CREATE TABLE Players( --- Players Tablosunun olusturulmasi
+	PLAYERID INT IDENTITY(1,1) NOT NULL, --- PlayerID sutununun olusturulmasi ayni sekilde identity 1den baslar 1er 1er artar otomatik deger alir
+	ID INT NOT NULL, --- ID sutununun olusturulmasi daha sonra bunu Accounts->ID ile FK -> PK iliskisi ile baglayacagiz
+	JOB VARCHAR(50) NOT NULL, 
+	LVL INT DEFAULT 1 CHECK (LVL>0 AND LVL <=99), 
+	CREATETIME DATE DEFAULT GETDATE(), 
+	CONSTRAINT PK_PLAYERID PRIMARY KEY (PLAYERID), 
+	CONSTRAINT FK_ID FOREIGN KEY (ID) REFERENCES Accounts(ID) 
 );
 
---ILERDE PLAYERNAME eklenecek
 
 INSERT INTO Players(ID, JOB, LVL)
 VALUES (1, 'Archer', 44);
@@ -33,7 +32,6 @@ VALUES (3, 'Mage', 99);
 INSERT INTO Players(ID, JOB, LVL)
 VALUES (5, 'Tank', 70);
 
--- ---- 1'e ÇOK ÝLÝÞKÝNÝN KANITI ----
 INSERT INTO Players(ID, JOB, LVL)
 VALUES (1, 'Mage', 15);
 
@@ -76,19 +74,19 @@ VALUES
 
 
 SELECT
-    A.USERID,  -- Hesap Adý (Accounts tablosundan)
-    P.JOB,      -- Oyuncu Mesleði (Players tablosundan)
+    A.USERID,  -- Hesap Adi (Accounts tablosundan)
+    P.JOB,      -- Oyuncu Meslegi (Players tablosundan)
 	IT.ITEMNAME --Itemname (Items tablosundan)
 FROM
     Accounts A
 JOIN
-    Players P ON A.ID = P.ID  -- Hesaplarý Oyunculara baðla
+    Players P ON A.ID = P.ID  -- Hesaplari Oyunculara bagla
 JOIN
-    Inventory IV ON P.PLAYERID = IV.PLAYERID  -- Oyuncularý Envantere baðla
+    Inventory IV ON P.PLAYERID = IV.PLAYERID  -- Oyunculari Envantere bagla
 JOIN
-    Items IT ON IV.ITEMID = IT.ITEMID  -- Envanteri Eþyalara baðla
+    Items IT ON IV.ITEMID = IT.ITEMID  -- Envanteri Esyalara bagla
 WHERE
-    IT.ITEMNAME = 'Staff'; -- Sadece 'Staff' adlý eþyaya sahip olanlarý filtrele
+    IT.ITEMNAME = 'Staff'; -- Sadece 'Staff' adli esyaya sahip olanlari filtrele
 
 
 
@@ -116,15 +114,15 @@ WHERE
 SELECT
     P.PLAYERID,
     P.JOB,
-    COUNT(IV.ITEMID) AS EsyaSayisi -- 'EsyaSayisi' adýnda yeni bir sanal sütun oluþtur
+    COUNT(IV.ITEMID) AS EsyaSayisi -- 'EsyaSayisi' adinda yeni bir sanal sutun olustur
 FROM
     Players P
 JOIN
     Inventory IV ON P.PLAYERID = IV.PLAYERID
 GROUP BY
-    P.PLAYERID, P.JOB  -- Hangi sütunlarý seçtiysek (COUNT hariç) onlarý gruplamalýyýz
+    P.PLAYERID, P.JOB  -- Hangi sutunlari seÃ§tiysek (COUNT hariÃ§) onlari gruplamaliyiz
 ORDER BY
-    EsyaSayisi DESC; -- En çok eþyasý olandan en aza doðru sýrala
+    EsyaSayisi DESC; -- En Ã§ok esyasi olandan en aza dogru sirala
 
 
 
